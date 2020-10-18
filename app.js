@@ -13,6 +13,32 @@ const connection = mysql.createConnection ({
     database  : 'crud_nodeJS'
 });
 
+
+app.get('/', ( req,res ) => {
+    res.send( 'Bienvenidos a nuestra api' );
+});
+
+
+app.get('/usuarios',( req, res ) => {
+    res.send('Lista de los Usuarios');
+});
+
+app.get('/usuarios/:id',( req, res ) => {
+    res.send('Lista de los Usuarios por id');
+});
+
+app.post( '/add', ( req, res ) => {
+    res.send( 'Nuevo usuario');
+});
+
+app.put( '/update/:cedula', (req, res) => {
+    res.send( 'Usuarios actualizados' );
+});
+
+app.delete('/delete/:cedula', (req, res) => {
+    res.send('Eliminar usuario');
+});
+
 connection.connect(error => {
     if(error) throw error;
     console.log( 'Base de datos esta corriendo' )
