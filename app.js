@@ -20,28 +20,78 @@ app.get('/', ( req,res ) => {
 
 
 app.get('/usuarios',( req, res ) => {
-    res.send('Lista de los Usuarios');
+    const sql = 'SELECT * FROM usuarios';
+    connection.query( sql, ( error, results ) => {
+        if( error ) throw error;
+        if( results.length > 0 ) {
+            res.json( results );
+        } else {
+            res.send( 'No hay resultados' )
+        }
+    });
 });
 
-app.get('/usuarios/:id',( req, res ) => {
-    res.send('Lista de los Usuarios por id');
+app.get('/usuarios/:cedula',( req, res ) => {
+   const {cedula} = req.params
+   const sql = `SELECT * FROM usuarios WHERE cedula = ${cedula}`;
+   connection.query( sql, ( error, results ) => {
+        if( error ) throw error;
+        if( results.length > 0 ) {
+            res.json( results );
+        } else {
+            res.send( 'No hay resultados' )
+        }
+    });
 });
 
 app.post( '/add', ( req, res ) => {
-    res.send( 'Nuevo usuario');
+    const sql = `INSERT INTO usuarios SET ?`;
+    const objUsuario = {
+        cedula   : req.body.cedula,
+        nombre   : req.body.nombre,
+        apellido : req.body.apellido,
+        correo   : req.body.correo
+    };
+    connection.query( sql, objUsuario, error => {
+        if( error ) throw error;
+        res.send( 'Usuario registrado!!!' );
+    });
 });
 
-app.put( '/update/:cedula', (req, res) => {
-    res.send( 'Usuarios actualizados' );
+app.put( '/update/:cedula', ( req, res ) => {
+    const {cedula} = req.params;
+    const { nombre, apellido, correo} = req.body;
+    const sql = `UPDATE
+                     usuarios 
+                SET 
+                    cedula    = '${cedula}',
+                    nombre    = '${nombre}', 
+                    apellido  = '${apellido}', 
+                    correo    = '${correo}'
+                WHERE 
+                    cedula = ${cedula}`;
+    connection.query( sql, error => {
+       if( error ) throw error;
+       res.send( 'Usuario actualizado!!!' );
+    });
 });
 
-app.delete('/delete/:cedula', (req, res) => {
-    res.send('Eliminar usuario');
+app.delete('/delete/:cedula', ( req, res ) => {
+    const {cedula} = req.params;
+    const sql = `DELETE 
+                 FROM 
+                    usuarios 
+                WHERE 
+                    cedula = ${cedula}`;
+    connection.query( sql, error => {
+        if( error ) throw error;
+        res.send( 'Usuario eliminado!!!' );
+     });
 });
 
-connection.connect(error => {
-    if(error) throw error;
+connection.connect( error => {
+    if( error ) throw error;
     console.log( 'Base de datos esta corriendo' )
 });
 
-app.listen(PORT, () => console.log( `El servidor esta corriendo en el puerto ${PORT}`));
+app.listen( PORT, () => console.log( `El servidor esta corriendo en el puerto ${PORT}` ));
